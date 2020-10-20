@@ -28,8 +28,8 @@ int main(int argc, char **argv)
 
 //Setting variables for command line arguments.
  int maxNumChildren = 4;
- int concurrentChildren = 2;
- int maxTimeSeconds = 100;
+ int concurrentChildren = 5;
+ int maxTimeSeconds = 20;
  string fileName = "logfile.out";
 
  if(argc < 1)
@@ -44,7 +44,7 @@ int main(int argc, char **argv)
  while (( option_index = getopt(argc, argv, "c:l:t:h")) != -1){
    switch (option_index) {
      case 'c':
-       maxNumChildren = atoi(optarg);
+       concurrentChildren = atoi(optarg);
        break;
      case 'l':
        fileName = optarg;
@@ -63,7 +63,7 @@ int main(int argc, char **argv)
    }  //end block for while
 
 
-	cout<<"\nMax num children: "<<maxNumChildren<<endl;
+	cout<<"\nMax num concurrent children: "<<concurrentChildren<<endl;
 	cout<<"Max time: "<<maxTimeSeconds<<endl;
 	cout<<"Input file name: "<<fileName<<endl;
 
@@ -86,7 +86,7 @@ if (pid == 0)
     tempString = palindromes[maxProcessCount-1];
     argvars[0] = (char *)tempString.c_str();
 
-    execvp("./userProcess",argvars);
+    execvp("./user",argvars);
 
 }
 else if (pid > 0)
