@@ -12,6 +12,7 @@
 #include <fstream>
 #include <vector>
 
+
 using namespace std;
 
 int main(int argc, char **argv)
@@ -20,11 +21,22 @@ int main(int argc, char **argv)
  vector<string> palindromes;
 
 //Establishing shared memory
- key_t key = 13933;
- int shmid = shmget(key,sizeof(int),0666|IPC_CREAT);
- int *ptr = (int*) shmat(shmid,(void*)0,0);
+key_t secondKey = 7688233;
+key_t nanSecondKey = 3768452;
+key_t shmPidKey = 4226754;
 
- *ptr = 789789;
+int shmid = shmget(secondKey,sizeof(int),0666|IPC_CREAT);
+int *secondPtr = (int*) shmat(shmid,(void*)0,0);
+
+shmid = shmget(nanSecondKey,sizeof(int),0666|IPC_CREAT);
+int *nanSecondPtr = (int*) shmat(shmid,(void*)0,0);
+
+shmid = shmget(shmPidKey,sizeof(int),0666|IPC_CREAT);
+int *shmPID = (int*) shmat(shmid,(void*)0,0);
+
+*secondPtr = 0;
+*nanSecondPtr = 0;
+*shmPID = 0;
 
  cout<<*ptr<<" parent is my value "<<ptr<<" is my address "<<endl;
 
@@ -138,6 +150,25 @@ else
 	        return 1;
 	    }
 	}*/
+    for(int i = 0; i < 20; i++)
+    {
+      *nanSecondPtr += 500;
+
+      if(nanSecondPtr%1000 == 0)
+      {
+        *nanSecondPtr = 0;
+        *secondPtr += 1;
+
+        if(*shmPID > 0)
+        {
+          cout<<"Child has set the shared pid to: "<<*shmPID<<endl;
+          *shmPID = 0;
+        }
+      }
+
+      sleep(2);
+    }
+
     wait();
     cout<<"Waited..."<<endl;
     cout<<"After child my shared memory is "<<*ptr<<endl;
