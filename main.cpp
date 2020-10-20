@@ -24,7 +24,7 @@ int main(int argc, char **argv)
  int shmid = shmget(key,sizeof(int),0666|IPC_CREAT);
  int *ptr = (int*) shmat(shmid,(void*)0,0);
 
- *ptr = 9;
+ *ptr = 789789;
 
  cout<<*ptr<<" parent is my value "<<ptr<<" is my address "<<endl;
 
@@ -79,7 +79,7 @@ int main(int argc, char **argv)
 	int counter = 0;
 	int curProcessCount = 0;
 	int maxProcessCount = 0;
-  pid_t pid;
+pid_t pid;
 
 pid = fork();
 
@@ -94,7 +94,7 @@ if (pid == 0)
 }
 else if (pid > 0)
 {
-    cout<<"I am the parent"<<endl;
+  //  cout<<"I am the parent"<<endl;
 }
 else
 {
@@ -138,8 +138,9 @@ else
 	        return 1;
 	    }
 	}*/
-    wait((int *)pid);
+    wait();
     cout<<"Waited..."<<endl;
+    cout<<"After child my shared memory is "<<*ptr<<endl;
 		//Deleting shared memory
 		shmdt((void *) ptr);
     shmctl(shmid, IPC_RMID, NULL);

@@ -25,6 +25,6 @@ int main(int argc,char *argv[])
 
 	cout<<"I am the one child process that should run."<<endl;
 
-
+  *ptr = 50;
   exit(0);
 }
