@@ -1,0 +1,13 @@
+This a read me file for my OS project 2. I am creating this file to test to make sure remote origin working correctly.
+
+I would suggest running make clean first to clean up any mess left behind. Then I would run make. 
+To invoke the program rub master.
+
+For more info run master -h for usage.
+
+I was able to make a program that solved the problem at hand.
+I did allocate shared memory but couldn't get to work properly so instead I just passed the palidrome to the child as an argument.
+I will make sure to correct this later.
+Command line parsing is correct.
+Critical section problem was not solved
+No timeout.
