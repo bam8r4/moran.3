@@ -1,13 +1,12 @@
-all: master palin
+all: oss user
 
-master: main.cpp
-	g++ -o master main.cpp
+oss: main.cpp
+	g++ -o oss main.cpp
 
-palin: helper.cpp
-	g++ -o palin helper.cpp
+user: helper.cpp
+	g++ -o user helper.cpp
 clean:
-	rm master
-	rm palin
+	rm oss
+	rm user
 	rm log.out
-	rm palin.out
-	rm nopalin.out
+	
