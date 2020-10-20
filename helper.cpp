@@ -21,6 +21,8 @@ int main(int argc,char *argv[])
   int shmid = shmget(key,sizeof(int),0666|IPC_CREAT);
   int *ptr = (int*) shmat(shmid,(void*)0,0);
 
+  cout<<*ptr<<" is my value "<<ptr<<" is my address "<<endl;
+
 	cout<<"I am the one child process that should run."<<endl;
 
 

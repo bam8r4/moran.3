@@ -26,6 +26,8 @@ int main(int argc, char **argv)
 
  *ptr = 9;
 
+ cout<<*ptr<<" parent is my value "<<ptr<<" is my address "<<endl;
+
 //Setting variables for command line arguments.
  int maxNumChildren = 4;
  int concurrentChildren = 5;
@@ -83,15 +85,16 @@ pid = fork();
 
 if (pid == 0)
 {	  //Make child;
-    tempString = palindromes[maxProcessCount-1];
-    argvars[0] = (char *)tempString.c_str();
+    cout<<"Inside"<<endl;
+    //tempString = palindromes[maxProcessCount-1];
+    //argvars[0] = (char *)tempString.c_str();
 
     execvp("./user",argvars);
 
 }
 else if (pid > 0)
 {
-    // parent process
+    cout<<"I am the parent"<<endl;
 }
 else
 {
@@ -135,7 +138,8 @@ else
 	        return 1;
 	    }
 	}*/
-
+    wait((int *)pid);
+    cout<<"Waited..."<<endl;
 		//Deleting shared memory
 		shmdt((void *) ptr);
     shmctl(shmid, IPC_RMID, NULL);
