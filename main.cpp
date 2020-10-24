@@ -185,10 +185,10 @@ else
 
     wait();
     cout<<"Waited..."<<endl;
-    cout<<"After child my shared memory is "<<*ptr<<endl;
+//    cout<<"After child my shared memory is "<<*ptr<<endl;
 		//Deleting shared memory
-		shmdt((void *) ptr);
-    shmctl(shmid, IPC_RMID, NULL);
+//		shmdt((void *) ptr);
+  //  shmctl(shmid, IPC_RMID, NULL);
 
     return 0;
 

@@ -53,7 +53,7 @@ int main(int argc,char *argv[])
   for(int i = 0; i < 50; i++)
   {
 
-    if(msgrcv(msgidParent, &parentMessage, sizeof(parentMessage), 1, 0) != -1))
+    if(msgrcv(msgidParent, &parentMessage, sizeof(parentMessage), 1, 0) != -1)
     {
         seconds = *secondPtr;
         nanSeconds = *nanSecondPtr;
@@ -62,7 +62,7 @@ int main(int argc,char *argv[])
 
         if(*shmPID == 0)
         {
-          cout<<"Child found shmpid as zero and set it to: "<<myPid<<;
+          cout<<"Child found shmpid as zero and set it to: "<<myPid<<endl;
           *shmPID = myPid;
         }
     }
