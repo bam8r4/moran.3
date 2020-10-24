@@ -49,6 +49,14 @@ int main(int argc,char *argv[])
   int nanSeconds = *nanSecondPtr;
   pid_t myPid = getpid();
 
+  while(myPid == 0)
+{  
+
+  myPid = getpid();
+
+}
+
+  cout << myPid << " this is my pid"<<endl;
 
   for(int i = 0; i < 50; i++)
   {
@@ -62,7 +70,8 @@ int main(int argc,char *argv[])
 
         if(*shmPID == 0)
         {
-          cout<<"Child found shmpid as zero and set it to: "<<myPid<<endl;
+	  cout<<"Still my pid is: "<<myPid<<endl;
+          cout<<"Child found shmpid as "<< *shmPID <<" and set it to: "<<myPid<<endl;
           *shmPID = myPid;
         }
     }

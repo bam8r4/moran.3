@@ -173,7 +173,8 @@ else
       {
         *nanSecondPtr = 0;
         *secondPtr += 1;
-
+	
+	cout<<"Current shared pid is : "<<*shmPID<<endl;
         if(*shmPID > 0)
         {
           cout<<"Child has set the shared pid to: "<<*shmPID<<endl;
