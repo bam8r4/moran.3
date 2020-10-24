@@ -10,12 +10,20 @@
 #include <sys/shm.h>
 #include <time.h>
 #include <fstream>
+#include <sys/msg.h>
 
 
 using namespace std;
 
+struct mesg_buffer {
+    long mesg_type = 1;
+    char mesg_text[1];
+};
+
 int main(int argc,char *argv[])
 {
+  struct mesg_buffer parentMessage;
+  struct mesg_buffer childMessage;
 
   key_t secondKey = 7688233;
   key_t nanSecondKey = 3768452;
@@ -32,6 +40,9 @@ int main(int argc,char *argv[])
   shmid = shmget(shmPidKey,sizeof(int),0666|IPC_CREAT);
   int *shmPID = (int*) shmat(shmid,(void*)0,0);
 
+  msgidParent = msgget(keyParentMessage, 0666 | IPC_CREAT);
+  msgidChild = msgget(keyChildMessage, 0666 | IPC_CREAT);
+
   int seconds = *secondPtr;
   int nanSeconds = *nanSecondPtr;
   pid_t myPid = getpid();
@@ -39,15 +50,23 @@ int main(int argc,char *argv[])
 
   for(int i = 0; i < 50; i++)
   {
-    seconds = *secondPtr;
-    nanSeconds = *nanSecondPtr;
 
-    cout<<"Current clock time in the child is" << seconds << "." <<nanSeconds<<endl;
-
-    if(*shmPID == 0)
+    if(msgrcv(msgidParent, &parentMessage, sizeof(parentMessage), 1, 0) != -1))
     {
-      cout<<"Child found shmpid as zero and set it to: "<<myPid<<;
-      *shmPID = myPid;
+        seconds = *secondPtr;
+        nanSeconds = *nanSecondPtr;
+
+        cout<<"Current clock time in the child is" << seconds << "." <<nanSeconds<<endl;
+
+        if(*shmPID == 0)
+        {
+          cout<<"Child found shmpid as zero and set it to: "<<myPid<<;
+          *shmPID = myPid;
+        }
+    }
+    else
+    {
+      cout<<"Didnt recieve the message"<<endl;
     }
 
     sleep(1);

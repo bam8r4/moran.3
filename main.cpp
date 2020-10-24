@@ -11,14 +11,23 @@
 #include <time.h>
 #include <fstream>
 #include <vector>
+#include <sys/msg.h>
 
 
 using namespace std;
 
+struct mesg_buffer {
+    long mesg_type = 1;
+    char mesg_text[1];
+};
+
 int main(int argc, char **argv)
 {
 
- vector<string> palindromes;
+struct mesg_buffer parentMessage;
+struct mesg_buffer childMessage;
+
+vector<string> palindromes;
 
 //Establishing shared memory
 key_t secondKey = 7688233;
@@ -26,7 +35,7 @@ key_t nanSecondKey = 3768452;
 key_t shmPidKey = 4226754;
 key_t keyParentMessage = 9446365;
 key_t keyChildMessage = 8849795;
- 
+
 int shmid = shmget(secondKey,sizeof(int),0666|IPC_CREAT);
 int *secondPtr = (int*) shmat(shmid,(void*)0,0);
 
@@ -35,6 +44,9 @@ int *nanSecondPtr = (int*) shmat(shmid,(void*)0,0);
 
 shmid = shmget(shmPidKey,sizeof(int),0666|IPC_CREAT);
 int *shmPID = (int*) shmat(shmid,(void*)0,0);
+
+msgidParent = msgget(keyParentMessage, 0666 | IPC_CREAT);
+msgidChild = msgget(keyChildMessage, 0666 | IPC_CREAT);
 
 *secondPtr = 0;
 *nanSecondPtr = 0;
@@ -102,7 +114,7 @@ if (pid == 0)
     cout<<"Inside"<<endl;
     //tempString = palindromes[maxProcessCount-1];
     //argvars[0] = (char *)tempString.c_str();
-
+    msgsnd(msgidParent, &parentMessage, sizeof(parentMessage), 0);
     execvp("./user",argvars);
 
 }
