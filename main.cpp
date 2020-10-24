@@ -26,6 +26,8 @@ int main(int argc, char **argv)
 
 struct mesg_buffer parentMessage;
 struct mesg_buffer childMessage;
+int msgidParent;
+int msgidChild;
 
 vector<string> palindromes;
 
@@ -51,8 +53,6 @@ msgidChild = msgget(keyChildMessage, 0666 | IPC_CREAT);
 *secondPtr = 0;
 *nanSecondPtr = 0;
 *shmPID = 0;
-
- cout<<*ptr<<" parent is my value "<<ptr<<" is my address "<<endl;
 
 //Setting variables for command line arguments.
  int maxNumChildren = 4;
@@ -168,7 +168,7 @@ else
     {
       *nanSecondPtr += 500;
 
-      if(nanSecondPtr%1000 == 0)
+      if(*nanSecondPtr%1000 == 0)
       {
         *nanSecondPtr = 0;
         *secondPtr += 1;

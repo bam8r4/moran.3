@@ -24,6 +24,8 @@ int main(int argc,char *argv[])
 {
   struct mesg_buffer parentMessage;
   struct mesg_buffer childMessage;
+  int msgidParent;
+  int msgidChild;
 
   key_t secondKey = 7688233;
   key_t nanSecondKey = 3768452;
