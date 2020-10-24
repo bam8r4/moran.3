@@ -166,6 +166,7 @@ else
 	}*/
     for(int i = 0; i < 20; i++)
     {
+      msgsnd(msgidParent, &parentMessage, sizeof(parentMessage), 0);
       *nanSecondPtr += 500;
 
       if(*nanSecondPtr%1000 == 0)
