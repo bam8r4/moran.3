@@ -20,6 +20,8 @@ int main(int argc,char *argv[])
   key_t secondKey = 7688233;
   key_t nanSecondKey = 3768452;
   key_t shmPidKey = 4226754;
+  key_t keyParentMessage = 9446365;
+  key_t keyChildMessage = 8849795;
 
   int shmid = shmget(secondKey,sizeof(int),0666|IPC_CREAT);
   int *secondPtr = (int*) shmat(shmid,(void*)0,0);
