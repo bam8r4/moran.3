@@ -197,4 +197,5 @@ msgidChild = msgget(keyChildMessage, 0666 | IPC_CREAT);
     return 0;
 
 
+  }
 }
