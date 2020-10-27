@@ -139,6 +139,7 @@ msgidChild = msgget(keyChildMessage, 0666 | IPC_CREAT);
 
       if (pid == 0)
       {	  //Exec child;
+          cout<<"Making child"<<endl;
           pids.push_back(pid);
           ofs<<"Master: Creating new child PID:"<<pid<<" at my time "<<*secondPtr<<"."<<*nanSecondPtr<<"\n";
           execvp("./user",argvars);
@@ -156,6 +157,7 @@ msgidChild = msgget(keyChildMessage, 0666 | IPC_CREAT);
 
       if(msgrcv(msgidChild, &childMessage, sizeof(childMessage), 1, 0) != -1)
       {
+        cout<<"Recieved message from child."<<endl;
         *nanSecondPtr += 100000;
 
         if(*nanSecondPtr%1000000 == 0)
@@ -180,7 +182,7 @@ msgidChild = msgget(keyChildMessage, 0666 | IPC_CREAT);
     while(terminatedProcesses < maxProcessCount)
     {
       cout<<"Term processes: "<<terminatedProcesses<<" maxProcessCount: "<<maxProcessCount<<endl;
-      sleep(0.5);
+      sleep(2);
     }
     cout<<"Waited..."<<endl;
 

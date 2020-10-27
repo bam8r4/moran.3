@@ -77,11 +77,12 @@ int main(int argc,char *argv[])
     myPid = getpid();
   }
 
+  cout<<"Current time was : "<<seconds<<"."<<nanSeconds<<" Death time is: "<<deathSeconds<<"."<<deathNanSeconds<<endl;
   while(keepAlive)
   {
 
     if(msgrcv(msgidParent, &parentMessage, sizeof(parentMessage), 1, 0) != -1)
-    {
+    {   cout<<"Recieved message from parent my pid is: "<<myPid<<endl;
         if(deathSeconds < *secondPtr)
         {
           expiredProc = true;
@@ -101,8 +102,8 @@ int main(int argc,char *argv[])
           *shmPID = myPid;
         }
 
-        msgsnd(msgidChild, &childMessage, sizeof(childMessage), 0);
     }
+    msgsnd(msgidChild, &childMessage, sizeof(childMessage), 0);
 
     sleep(1);
 
