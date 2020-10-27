@@ -96,8 +96,8 @@ int main(int argc,char *argv[])
 
         if(*shmPID == 0 && expiredProc == true)
         {
-	        /*cout<<"Still my pid is: "<<myPid<<endl;
-          cout<<"Child found shmpid as "<< *shmPID <<" and set it to: "<<myPid<<endl;*/
+	        cout<<"Still my pid is: "<<myPid<<endl;
+          cout<<"Child found shmpid as "<< *shmPID <<" and set it to: "<<myPid<<endl;
           keepAlive = false;
           *shmPID = myPid;
         }

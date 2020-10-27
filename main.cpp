@@ -109,6 +109,7 @@ msgidChild = msgget(keyChildMessage, 0666 | IPC_CREAT);
 
 	//ifstream inFile(fileName.c_str());
   ofs.open (fileName.c_str(), std::ofstream::out | std::ofstream::app);
+  ofs<<"Start of log"<<"\n";
 
   //palindromes.push_back(str);
 
@@ -130,12 +131,15 @@ msgidChild = msgget(keyChildMessage, 0666 | IPC_CREAT);
 			{
 				wait();
 			}
-			while(curProcessCount < concurrentChildren)
-			{
-				curProcessCount += 1;
-				maxProcessCount += 1;
-				pid = fork();
-			}
+			//while(curProcessCount < concurrentChildren)
+			//{
+        if (curProcessCount == 0)
+        {
+          cout<<"forkgin"<<endl;
+          curProcessCount += 1;
+  				maxProcessCount += 1;
+  				pid = fork();
+			  }
 
       if (pid == 0)
       {	  //Exec child;
@@ -174,9 +178,9 @@ msgidChild = msgget(keyChildMessage, 0666 | IPC_CREAT);
             *shmPID = 0;
           }
 
-          msgsnd(msgidParent, &parentMessage, sizeof(parentMessage), 0);
-      }
 
+        }
+        msgsnd(msgidParent, &parentMessage, sizeof(parentMessage), 0);
     }
 
     while(terminatedProcesses < maxProcessCount)
