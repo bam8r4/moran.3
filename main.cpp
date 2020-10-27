@@ -12,9 +12,16 @@
 #include <fstream>
 #include <vector>
 #include <sys/msg.h>
+#include <signal.h>
 
 
 using namespace std;
+
+void signal_callback_handler(int signum) {
+   cout << "Terminating with Control C " << signum << endl;
+   // Terminate program
+   exit(signum);
+}
 
 struct mesg_buffer {
     long mesg_type = 1;
@@ -24,12 +31,17 @@ struct mesg_buffer {
 int main(int argc, char **argv)
 {
 
+ofstream ofs;
+
+//Adding signal handler.
+signal(SIGINT, signal_callback_handler);
+
 struct mesg_buffer parentMessage;
 struct mesg_buffer childMessage;
 int msgidParent;
 int msgidChild;
 
-vector<string> palindromes;
+vector<int> pids;
 
 //Establishing shared memory
 key_t secondKey = 7688233;
@@ -38,14 +50,14 @@ key_t shmPidKey = 4226754;
 key_t keyParentMessage = 9446365;
 key_t keyChildMessage = 8849795;
 
-int shmid = shmget(secondKey,sizeof(int),0666|IPC_CREAT);
-int *secondPtr = (int*) shmat(shmid,(void*)0,0);
+int shmid1 = shmget(secondKey,sizeof(int),0666|IPC_CREAT);
+int *secondPtr = (int*) shmat(shmid1,(void*)0,0);
 
-shmid = shmget(nanSecondKey,sizeof(int),0666|IPC_CREAT);
-int *nanSecondPtr = (int*) shmat(shmid,(void*)0,0);
+int shmid2 = shmget(nanSecondKey,sizeof(int),0666|IPC_CREAT);
+int *nanSecondPtr = (int*) shmat(shmid2,(void*)0,0);
 
-shmid = shmget(shmPidKey,sizeof(int),0666|IPC_CREAT);
-int *shmPID = (int*) shmat(shmid,(void*)0,0);
+int shmid3 = shmget(shmPidKey,sizeof(int),0666|IPC_CREAT);
+int *shmPID = (int*) shmat(shmid3,(void*)0,0);
 
 msgidParent = msgget(keyParentMessage, 0666 | IPC_CREAT);
 msgidChild = msgget(keyChildMessage, 0666 | IPC_CREAT);
@@ -55,7 +67,7 @@ msgidChild = msgget(keyChildMessage, 0666 | IPC_CREAT);
 *shmPID = 0;
 
 //Setting variables for command line arguments.
- int maxNumChildren = 4;
+ int maxNumChildren = 100;
  int concurrentChildren = 5;
  int maxTimeSeconds = 20;
  string fileName = "logfile.out";
@@ -95,7 +107,8 @@ msgidChild = msgget(keyChildMessage, 0666 | IPC_CREAT);
 	cout<<"Max time: "<<maxTimeSeconds<<endl;
 	cout<<"Input file name: "<<fileName<<endl;
 
-	ifstream inFile(fileName.c_str());
+	//ifstream inFile(fileName.c_str());
+  ofs.open (fileName.c_str(), std::ofstream::out | std::ofstream::app);
 
   //palindromes.push_back(str);
 
@@ -105,92 +118,81 @@ msgidChild = msgget(keyChildMessage, 0666 | IPC_CREAT);
 	int counter = 0;
 	int curProcessCount = 0;
 	int maxProcessCount = 0;
-pid_t pid;
+  int terminatedProcesses = 0;
+  pid_t pid;
 
-pid = fork();
+  pid = fork();
 
-if (pid == 0)
-{	  //Make child;
-    cout<<"Inside"<<endl;
-    //tempString = palindromes[maxProcessCount-1];
-    //argvars[0] = (char *)tempString.c_str();
     msgsnd(msgidParent, &parentMessage, sizeof(parentMessage), 0);
-    execvp("./user",argvars);
-
-}
-else if (pid > 0)
-{
-  //  cout<<"I am the parent"<<endl;
-}
-else
-{
-    // fork failed
-    perror("fork() failed!\n");
-    return 1;
-}
-
-
-  /*while(maxProcessCount <= maxNumChildren)
-	{
-		  while(curProcessCount >= concurrentChildren)
+    while(maxProcessCount <= maxNumChildren)
+    {
+      while(curProcessCount >= concurrentChildren)
 			{
 				wait();
-
 			}
-			if(curProcessCount < concurrentChildren)
+			while(curProcessCount < concurrentChildren)
 			{
-				concurrentChildren += 1;
+				curProcessCount += 1;
 				maxProcessCount += 1;
 				pid = fork();
 			}
 
-	    if (pid == 0)
-	    {	  //Make child;
-				  tempString = palindromes[maxProcessCount-1];
-				  argvars[0] = (char *)tempString.c_str();
-					//argvars[1] = (char *)(maxProcessCount-1);
-
-				  execvp("./palin",argvars);
-
-	    }
-	    else if (pid > 0)
-	    {
-	        // parent process
-	    }
-	    else
-	    {
-	        // fork failed
-	        perror("fork() failed!\n");
-	        return 1;
-	    }
-	}*/
-    for(int i = 0; i < 20; i++)
-    {
-      msgsnd(msgidParent, &parentMessage, sizeof(parentMessage), 0);
-      *nanSecondPtr += 500;
-
-      if(*nanSecondPtr%1000 == 0)
+      if (pid == 0)
+      {	  //Exec child;
+          pids.push_back(pid);
+          ofs<<"Master: Creating new child PID:"<<pid<<" at my time "<<*secondPtr<<"."<<*nanSecondPtr<<"\n";
+          execvp("./user",argvars);
+      }
+      else if (pid > 0)
       {
-        *nanSecondPtr = 0;
-        *secondPtr += 1;
-	
-	cout<<"Current shared pid is : "<<*shmPID<<endl;
-        if(*shmPID > 0)
-        {
-          cout<<"Child has set the shared pid to: "<<*shmPID<<endl;
-          *shmPID = 0;
-        }
+        //Parent process
+      }
+      else
+      {
+          // fork failed
+          perror("fork() failed!\n");
+          return 1;
       }
 
-      sleep(2);
+      if(msgrcv(msgidChild, &childMessage, sizeof(childMessage), 1, 0) != -1)
+      {
+        *nanSecondPtr += 100000;
+
+        if(*nanSecondPtr%1000000 == 0)
+        {
+          *nanSecondPtr = 0;
+          *secondPtr += 1;
+
+  	      cout<<"Current shared pid is : "<<*shmPID<<endl;
+          if(*shmPID > 0)
+          {
+            ofs<<"Master: Child PID:"<<*shmPID<<" is terminating at system time "<<*secondPtr<<"."<<*nanSecondPtr<<"\n";
+            curProcessCount -= 1;
+            terminatedProcesses += 1;
+            *shmPID = 0;
+          }
+
+          msgsnd(msgidParent, &parentMessage, sizeof(parentMessage), 0);
+      }
+
     }
 
-    wait();
+    while(terminatedProcesses < maxProcessCount)
+    {
+      cout<<"Term processes: "<<terminatedProcesses<<" maxProcessCount: "<<maxProcessCount<<endl;
+      sleep(0.5);
+    }
     cout<<"Waited..."<<endl;
-//    cout<<"After child my shared memory is "<<*ptr<<endl;
-		//Deleting shared memory
-//		shmdt((void *) ptr);
-  //  shmctl(shmid, IPC_RMID, NULL);
+
+    //Detaching from shared memory
+    shmdt((int *) secondPtr);
+    shmdt((int *) nanSecondPtr);
+    shmdt((int *) shmPID);
+
+    //Deleting shared memory
+    shmctl(shmid1, IPC_RMID, NULL);
+    shmctl(shmid2, IPC_RMID, NULL);
+    shmctl(shmid3, IPC_RMID, NULL);
 
     return 0;
 

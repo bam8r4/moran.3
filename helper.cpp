@@ -11,6 +11,8 @@
 #include <time.h>
 #include <fstream>
 #include <sys/msg.h>
+#include <signal.h>
+#include <time.h>
 
 
 using namespace std;
@@ -22,6 +24,11 @@ struct mesg_buffer {
 
 int main(int argc,char *argv[])
 {
+  srand(time(0));
+
+  bool keepAlive = true;
+  bool expiredProc = false;
+
   struct mesg_buffer parentMessage;
   struct mesg_buffer childMessage;
   int msgidParent;
@@ -33,59 +40,80 @@ int main(int argc,char *argv[])
   key_t keyParentMessage = 9446365;
   key_t keyChildMessage = 8849795;
 
-  int shmid = shmget(secondKey,sizeof(int),0666|IPC_CREAT);
-  int *secondPtr = (int*) shmat(shmid,(void*)0,0);
+  int shmid1 = shmget(secondKey,sizeof(int),0666|IPC_CREAT);
+  int *secondPtr = (int*) shmat(shmid1,(void*)0,0);
 
-  shmid = shmget(nanSecondKey,sizeof(int),0666|IPC_CREAT);
-  int *nanSecondPtr = (int*) shmat(shmid,(void*)0,0);
+  int shmid2 = shmget(nanSecondKey,sizeof(int),0666|IPC_CREAT);
+  int *nanSecondPtr = (int*) shmat(shmid2,(void*)0,0);
 
-  shmid = shmget(shmPidKey,sizeof(int),0666|IPC_CREAT);
-  int *shmPID = (int*) shmat(shmid,(void*)0,0);
+  int shmid3 = shmget(shmPidKey,sizeof(int),0666|IPC_CREAT);
+  int *shmPID = (int*) shmat(shmid3,(void*)0,0);
 
   msgidParent = msgget(keyParentMessage, 0666 | IPC_CREAT);
   msgidChild = msgget(keyChildMessage, 0666 | IPC_CREAT);
 
   int seconds = *secondPtr;
   int nanSeconds = *nanSecondPtr;
+  int lifeSpan = abs((rand()*rand())%1000000)
+  int deathNanSeconds = 0;
+  int deathSeconds = 0;
+
+  deathNanSeconds = nanSeconds + lifeSpan;
+
+  if(deathNanSeconds >= 1000000)
+  {
+    deathSeconds = seconds + 1;
+    deathNanSeconds = deathNanSeconds % 1000000;
+  }
+  else
+  {
+    deathSeconds = seconds;
+  }
+
   pid_t myPid = getpid();
 
-  while(myPid == 0)
-{  
+    while(myPid == 0)
+  {
+    myPid = getpid();
+  }
 
-  myPid = getpid();
-
-}
-
-  cout << myPid << " this is my pid"<<endl;
-
-  for(int i = 0; i < 50; i++)
+  while(keepAlive)
   {
 
     if(msgrcv(msgidParent, &parentMessage, sizeof(parentMessage), 1, 0) != -1)
     {
-        seconds = *secondPtr;
-        nanSeconds = *nanSecondPtr;
+        if(deathSeconds < *secondPtr)
+        {
+          expiredProc = true;
+        }
+        elif(deathSeconds == *secondPtr && deathNanSeconds >= *nanSecondPtr)
+        {
+          expiredProc = true;
+        }
 
         cout<<"Current clock time in the child is" << seconds << "." <<nanSeconds<<endl;
 
-        if(*shmPID == 0)
+        if(*shmPID == 0 && expiredProc == true)
         {
-	  cout<<"Still my pid is: "<<myPid<<endl;
-          cout<<"Child found shmpid as "<< *shmPID <<" and set it to: "<<myPid<<endl;
+	        /*cout<<"Still my pid is: "<<myPid<<endl;
+          cout<<"Child found shmpid as "<< *shmPID <<" and set it to: "<<myPid<<endl;*/
+          keepAlive = false;
           *shmPID = myPid;
         }
-    }
-    else
-    {
-      cout<<"Didnt recieve the message"<<endl;
+
+        msgsnd(msgidChild, &childMessage, sizeof(childMessage), 0);
     }
 
     sleep(1);
 
   }
 
+  }
 
-
+//Detaching from shared memory
+shmdt((int *) secondPtr);
+shmdt((int *) nanSecondPtr);
+shmdt((int *) shmPID);
 
   exit(0);
 }
