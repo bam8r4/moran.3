@@ -31,7 +31,7 @@ struct mesg_buffer {
 int main(int argc, char **argv)
 {
 
-ofstream ofs;
+
 
 //Adding signal handler.
 signal(SIGINT, signal_callback_handler);
@@ -108,7 +108,8 @@ msgidChild = msgget(keyChildMessage, 0666 | IPC_CREAT);
 	cout<<"Input file name: "<<fileName<<endl;
 
 	//ifstream inFile(fileName.c_str());
-  ofs.open (fileName.c_str(), std::ofstream::out | std::ofstream::app);
+  //ofstream palLog("log.out", std::ofstream::out | std::ofstream::app);
+  ofsteam ofs(fileName.c_str(), std::ofstream::out | std::ofstream::app);
   ofs<<"Start of log"<<"\n";
 
   //palindromes.push_back(str);
@@ -125,7 +126,7 @@ msgidChild = msgget(keyChildMessage, 0666 | IPC_CREAT);
   pid = fork();
 
     msgsnd(msgidParent, &parentMessage, sizeof(parentMessage), 0);
-    while(maxProcessCount <= maxNumChildren)
+    while(1==1)
     {
       while(curProcessCount >= concurrentChildren)
 			{
@@ -133,9 +134,9 @@ msgidChild = msgget(keyChildMessage, 0666 | IPC_CREAT);
 			}
 			//while(curProcessCount < concurrentChildren)
 			//{
-        if (curProcessCount == 0)
+        if (curProcessCount < 1)
         {
-          cout<<"forkgin"<<endl;
+          //cout<<"forkgin"<<endl;
           curProcessCount += 1;
   				maxProcessCount += 1;
   				pid = fork();
@@ -169,7 +170,7 @@ msgidChild = msgget(keyChildMessage, 0666 | IPC_CREAT);
           *nanSecondPtr = 0;
           *secondPtr += 1;
 
-  	      cout<<"Current shared pid is : "<<*shmPID<<endl;
+  	      //cout<<"Current shared pid is : "<<*shmPID<<endl;
           if(*shmPID > 0)
           {
             ofs<<"Master: Child PID:"<<*shmPID<<" is terminating at system time "<<*secondPtr<<"."<<*nanSecondPtr<<"\n";

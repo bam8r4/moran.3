@@ -77,7 +77,7 @@ int main(int argc,char *argv[])
     myPid = getpid();
   }
 
-  cout<<"Current time was : "<<seconds<<"."<<nanSeconds<<" Death time is: "<<deathSeconds<<"."<<deathNanSeconds<<endl;
+  //cout<<"Current time was : "<<seconds<<"."<<nanSeconds<<" Death time is: "<<deathSeconds<<"."<<deathNanSeconds<<endl;
   while(keepAlive)
   {
 
@@ -92,12 +92,12 @@ int main(int argc,char *argv[])
           expiredProc = true;
         }
 
-        cout<<"Current clock time in the child is" << seconds << "." <<nanSeconds<<endl;
+        //cout<<"Current clock time in the child is" << seconds << "." <<nanSeconds<<endl;
 
         if(*shmPID == 0 && expiredProc == true)
         {
-	        cout<<"Still my pid is: "<<myPid<<endl;
-          cout<<"Child found shmpid as "<< *shmPID <<" and set it to: "<<myPid<<endl;
+	        //cout<<"Still my pid is: "<<myPid<<endl;
+          //cout<<"Child found shmpid as "<< *shmPID <<" and set it to: "<<myPid<<endl;
           keepAlive = false;
           *shmPID = myPid;
         }
