@@ -54,7 +54,7 @@ int main(int argc,char *argv[])
 
   int seconds = *secondPtr;
   int nanSeconds = *nanSecondPtr;
-  int lifeSpan = abs((rand()*rand())%1000000)
+  int lifeSpan = abs((rand()*rand())%1000000);
   int deathNanSeconds = 0;
   int deathSeconds = 0;
 
@@ -86,7 +86,7 @@ int main(int argc,char *argv[])
         {
           expiredProc = true;
         }
-        elif(deathSeconds == *secondPtr && deathNanSeconds >= *nanSecondPtr)
+        else if(deathSeconds == *secondPtr && deathNanSeconds >= *nanSecondPtr)
         {
           expiredProc = true;
         }
@@ -108,7 +108,7 @@ int main(int argc,char *argv[])
 
   }
 
-  }
+
 
 //Detaching from shared memory
 shmdt((int *) secondPtr);
@@ -116,4 +116,5 @@ shmdt((int *) nanSecondPtr);
 shmdt((int *) shmPID);
 
   exit(0);
+
 }
