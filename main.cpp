@@ -126,7 +126,7 @@ msgidChild = msgget(keyChildMessage, 0666 | IPC_CREAT);
   pid = fork();
 
     msgsnd(msgidParent, &parentMessage, sizeof(parentMessage), 0);
-    while(1==1)
+    while(true)
     {
       while(curProcessCount >= concurrentChildren)
 			{
